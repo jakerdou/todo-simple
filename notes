@@ -1,0 +1,22 @@
+db structure - 
+/users/{userId}
+  └── recurrences/
+        └── {recurrenceId}
+              ├── title: "Take out trash"
+              ├── startDate: "2025-05-14"
+              ├── frequency: "weekly"  // or "daily", "monthly", etc
+              ├── timeOfDay: "20:00"
+              ├── daysOfWeek: ["mon", "wed", "fri"] // optional
+              └── ends: "2025-12-31" // optional
+
+  └── instances/
+        └── {instanceId}
+              ├── title: "Take out trash"
+              ├── date: "2025-05-14"
+              ├── completed: false
+              ├── recurrenceId: "abc123" // optional — null for one-off
+              └── createdBy: "recurrence" | "user"
+
+
+
+maybe use headless ui for buttons and forms and stuff
