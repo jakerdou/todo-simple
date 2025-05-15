@@ -3,20 +3,21 @@ db structure -
   └── recurrences/
         └── {recurrenceId}
               ├── title: "Take out trash"
-              ├── startDate: "2025-05-14"
-              ├── frequency: "weekly"  // or "daily", "monthly", etc
-              ├── timeOfDay: "20:00"
-              ├── daysOfWeek: ["mon", "wed", "fri"] // optional
-              └── ends: "2025-12-31" // optional
+              ├── rrule: "FREQ=WEEKLY;BYDAY=MO" // recurrence rule
+              ├── created_at: 
+
 
   └── instances/
         └── {instanceId}
               ├── title: "Take out trash"
               ├── date: "2025-05-14"
               ├── completed: false
+              ├── isRecurring: false
               ├── recurrenceId: "abc123" // optional — null for one-off
-              └── createdBy: "recurrence" | "user"
+              ├── created_at: 
 
 
 
 maybe use headless ui for buttons and forms and stuff
+
+create toggle for recurrence and rrule generator

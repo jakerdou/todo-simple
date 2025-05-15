@@ -5,6 +5,14 @@ export interface TodoItem {
   name: string;
   date: string;  // YYYY-MM-DD format
   completed: boolean;
-  recurrenceId: string | null;
+  createdAt?: Timestamp;
+  isRecurring?: boolean;
+  recurrenceId?: string | null;
+}
+
+export interface RecurrencePattern {
+  id?: string;
+  name: string;
+  rrule: string;
   createdAt?: Timestamp;
 }
