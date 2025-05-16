@@ -45,14 +45,12 @@ export const addTodoInstance = async (
  * @param userId - The ID of the current user
  * @param name - The name/title of the todo
  * @param rruleString - The RRule string representing the recurrence pattern
- * @param _unused - Deprecated parameter, kept for API compatibility
  * @returns Promise with the recurrence pattern document reference
  */
 export const addRecurringTodo = async (
   userId: string,
   name: string,
   rruleString: string,
-  _unused?: number  // Deprecated parameter, kept for API compatibility
 ) => {
   try {
     // Create the recurrence pattern
@@ -82,7 +80,6 @@ export const addRecurringTodo = async (
       recurrenceId,
       name,
       rruleString,
-      undefined, // Deprecated parameter
       todayStart // Only generate for today
     );
     
@@ -98,7 +95,6 @@ export const addRecurringTodo = async (
  * @param recurrenceId - The ID of the recurrence pattern
  * @param name - The name/title of the todo
  * @param rruleString - The RRule string representing the recurrence pattern
- * @param _unused - Deprecated parameter, kept for backward compatibility
  * @param startDate - Date to start generating from (defaults to today)
  * @param endDate - Optional end date to stop generating at
  */
@@ -107,7 +103,6 @@ export const generateTodoInstances = async (
   recurrenceId: string,
   name: string,
   rruleString: string,
-  _unused?: number, // Deprecated parameter, kept for backward compatibility
   startDate: Date = new Date(),
   endDate?: Date
 ) => {
@@ -115,17 +110,23 @@ export const generateTodoInstances = async (
     // Parse the RRule string
     const rule = RRule.fromString(rruleString);
     
+    // Adjust start date to beginning of day to ensure we capture all events
+    const adjustedStartDate = new Date(startDate);
+    adjustedStartDate.setHours(0, 0, 0, 0);
+      
     // Get occurrences based on the provided parameters
     let occurrences: Date[];
-    
-    if (endDate) {
-      // If we have both start and end dates, get instances between them
-      occurrences = rule.between(startDate, endDate, true);
+      if (endDate) {
+      // If we have both start and end dates, get instances between them, inclusive
+      // Set the end date to 11:59:59 PM to include the entire end date
+      const adjustedEndDate = new Date(endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      occurrences = rule.between(adjustedStartDate, adjustedEndDate, true);
     } else {
       // If no end date, generate just for the start date (for one day)
-      const nextDay = new Date(startDate);
+      const nextDay = new Date(adjustedStartDate);
       nextDay.setDate(nextDay.getDate() + 1);
-      occurrences = rule.between(startDate, nextDay, true);
+      occurrences = rule.between(adjustedStartDate, nextDay, true);
     }
     
     const instancesCollectionRef = collection(db, `users/${userId}/instances`);
@@ -139,7 +140,8 @@ export const generateTodoInstances = async (
     const existingDates = new Set(
       existingInstancesSnapshot.docs.map(doc => doc.data().date)
     );
-    
+   
+    let occurencesCreated = 0;
     // Create a batch of todo instances for each occurrence date
     const createInstancePromises = occurrences.map(date => {
       const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD format
@@ -159,12 +161,13 @@ export const generateTodoInstances = async (
         createdAt: serverTimestamp() as Timestamp
       };
       
+      occurencesCreated++;
       return addDoc(instancesCollectionRef, todoData);
     });
     
     await Promise.all(createInstancePromises);
     
-    console.log(`Generated ${occurrences.length} todo instances`);
+    console.log(`Generated ${occurencesCreated} todo instances`);
   } catch (error) {
     console.error('Error generating todo instances: ', error);
     throw error;
@@ -198,7 +201,6 @@ export const refreshRecurringTodoInstances = async (
         pattern.id!,
         pattern.name,
         pattern.rrule,
-        undefined, // No count limit when using date range
         startDate,
         endDate
       )

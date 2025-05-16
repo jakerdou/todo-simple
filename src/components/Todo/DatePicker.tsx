@@ -4,6 +4,10 @@ interface DatePickerProps {
 }
 
 export default function DatePicker({ selectedDate, onDateChange }: DatePickerProps) {
+  // Get today's date and the limit date (3 months from today)
+  const today = new Date();
+  const limitDate = new Date(today.getFullYear(), today.getMonth() + 3, 0); // Last day of third month
+  
   // Navigate to previous day
   const goToPreviousDay = () => {
     const prevDay = new Date(selectedDate);
@@ -15,7 +19,11 @@ export default function DatePicker({ selectedDate, onDateChange }: DatePickerPro
   const goToNextDay = () => {
     const nextDay = new Date(selectedDate);
     nextDay.setDate(nextDay.getDate() + 1);
-    onDateChange(nextDay);
+    
+    // Check if next day is beyond our limit
+    if (nextDay <= limitDate) {
+      onDateChange(nextDay);
+    }
   };
 
   // Go to today
@@ -25,10 +33,15 @@ export default function DatePicker({ selectedDate, onDateChange }: DatePickerPro
   
   // Check if a date is today
   const isToday = (date: Date): boolean => {
-    const today = new Date();
     return date.getDate() === today.getDate() &&
       date.getMonth() === today.getMonth() &&
       date.getFullYear() === today.getFullYear();
+  };
+  
+  // Check if selected date is at the limit
+  const isAtFutureLimit = (): boolean => {
+    // If selected date is at or beyond the limit, disable next button
+    return selectedDate.getTime() >= limitDate.getTime();
   };
 
   return (
@@ -60,17 +73,27 @@ export default function DatePicker({ selectedDate, onDateChange }: DatePickerPro
             Go to Today
           </button>
         )}
+      </div>      <div className="relative group">
+        <button 
+          onClick={goToNextDay}
+          className={`p-2 ${
+            isAtFutureLimit() 
+              ? 'text-gray-600 cursor-not-allowed' 
+              : 'text-gray-400 hover:text-blue-400'
+          } focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-full`}
+          aria-label="Next day"
+          disabled={isAtFutureLimit()}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+          </svg>
+        </button>
+        {isAtFutureLimit() && (
+          <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-xs text-white p-1 rounded shadow-lg whitespace-nowrap">
+            Cannot navigate beyond 3 months from today
+          </div>
+        )}
       </div>
-      
-      <button 
-        onClick={goToNextDay}
-        className="p-2 text-gray-400 hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-full"
-        aria-label="Next day"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-        </svg>
-      </button>
     </div>
   );
 }

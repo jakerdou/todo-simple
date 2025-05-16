@@ -18,6 +18,4 @@ db structure -
 
 
 
-maybe use headless ui for buttons and forms and stuff
-
-create toggle for recurrence and rrule generator
+make sure we only get instances that are in that date range for generate instances from a recurrence

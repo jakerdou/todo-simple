@@ -8,13 +8,20 @@ import ProfileTab from './components/Profile/ProfileTab';
 
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState('todo');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // Function to switch to Todo tab with a specific date
+  const switchToTodoTab = (date: Date) => {
+    setSelectedDate(date);
+    setActiveTab('todo');
+  };
 
   return (
     <div className="flex flex-col h-screen">      
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        {activeTab === 'todo' && <TodoTab />}
-        {activeTab === 'monthly' && <MonthlyTab />}
+      <div className="flex-1 overflow-auto bg-gray-900">
+        {activeTab === 'todo' && <TodoTab selectedDate={selectedDate} setSelectedDate={setSelectedDate} />}
+        {activeTab === 'monthly' && <MonthlyTab selectedDate={selectedDate} setSelectedDate={setSelectedDate} switchToTodoTab={switchToTodoTab} />}
         {activeTab === 'profile' && <ProfileTab />}
       </div>
       

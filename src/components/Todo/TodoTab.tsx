@@ -11,14 +11,18 @@ import { toggleTodoCompleted } from '../../services/update';
 import { deleteTodoInstance, deleteRecurringTodo } from '../../services/delete';
 import type { TodoItem } from '../../models';
 
-export default function TodoTab() {
+interface TodoTabProps {
+  selectedDate: Date;
+  setSelectedDate: (date: Date) => void;
+}
+
+export default function TodoTab({ selectedDate, setSelectedDate }: TodoTabProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<TodoItem | null>(null);
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { currentUser } = useAuth();
 
   // Format date as YYYY-MM-DD for Firestore query
@@ -27,7 +31,7 @@ export default function TodoTab() {
   };
   // Fetch todos when the component mounts, when the dialog closes, or when selected date changes
   useEffect(() => {
-    if (!currentUser) return;    
+    if (!currentUser || isDialogOpen) return;    
     const loadTodos = async () => {
       try {
         setLoading(true);
@@ -143,15 +147,18 @@ export default function TodoTab() {
               onDateChange={setSelectedDate}
             />
               <ul className="space-y-2">
-              {todos.map(todo => (
-                <li 
+              {todos.map(todo => (                <li 
                   key={todo.id} 
-                  className="bg-gray-700 rounded-md p-3 flex items-center shadow-sm"
+                  className="bg-gray-700 rounded-md p-3 flex items-center shadow-sm cursor-pointer hover:bg-gray-600 transition-colors"
+                  onClick={() => handleToggleCompleted(todo.id!, todo.completed)}
                 >
                   <input
                     type="checkbox"
                     checked={todo.completed}
-                    onChange={() => handleToggleCompleted(todo.id!, todo.completed)}
+                    onChange={(e) => {
+                      e.stopPropagation(); // Prevent the li onClick from firing too
+                      handleToggleCompleted(todo.id!, todo.completed);
+                    }}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-500 rounded mr-3"
                   />
                   <div className="flex-1">
@@ -159,15 +166,17 @@ export default function TodoTab() {
                       {todo.name}
                     </span>
                     
-                    {todo.isRecurring && (
+                    {/* {todo.isRecurring && (
                       <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-900 text-blue-300">
                         Recurring
                       </span>
-                    )}
+                    )} */}
                   </div>
-                  
-                  <Menu as="div" className="relative ml-3">
-                    <Menu.Button className="flex items-center rounded-full p-1 text-gray-400 hover:text-white hover:bg-gray-600">
+                    <Menu as="div" className="relative ml-3">
+                    <Menu.Button 
+                      className="flex items-center rounded-full p-1 text-gray-400 hover:text-white hover:bg-gray-600"
+                      onClick={(e) => e.stopPropagation()} // Prevent triggering the parent onClick
+                    >
                       <span className="sr-only">Open options</span>
                       <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
                     </Menu.Button>
@@ -178,12 +187,14 @@ export default function TodoTab() {
                       leave="transition ease-in duration-75"
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
-                    >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    >                      <Menu.Items className="absolute right-0 z-10 mt-2 w-32 origin-top-right rounded-md bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <Menu.Item>
                           {({ active }) => (
                             <button
-                              onClick={() => handleEditTodo(todo)}
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent toggling todo completion
+                                handleEditTodo(todo);
+                              }}
                               className={`${
                                 active ? 'bg-gray-700' : ''
                               } flex w-full px-4 py-2 text-sm text-white`}
@@ -195,7 +206,10 @@ export default function TodoTab() {
                         <Menu.Item>
                           {({ active }) => (
                             <button
-                              onClick={() => handleOpenDeleteDialog(todo)}
+                              onClick={(e) => {
+                                e.stopPropagation(); // Prevent toggling todo completion
+                                handleOpenDeleteDialog(todo);
+                              }}
                               className={`${
                                 active ? 'bg-gray-700' : ''
                               } flex w-full px-4 py-2 text-sm text-red-400`}
