@@ -1,11 +1,47 @@
-# React + TypeScript + Vite
+# Todo Simple
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern todo app with calendar view, built with React, TypeScript, and Firebase.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Todo management with completion tracking
+- Monthly calendar view with todo statistics
+- Firebase authentication and data storage
+- Dark theme
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+## Deployment
+
+This project is configured to deploy to GitHub Pages.
+
+1. Update the `homepage` field in `package.json` with your GitHub username:
+   ```
+   "homepage": "https://YOUR_GITHUB_USERNAME.github.io/todo-simple",
+   ```
+
+2. Deploy manually:
+   ```bash
+   npm run deploy
+   ```
+
+3. Or push to the main branch to trigger GitHub Actions deployment.
+
+## Firebase Setup
+
+The app requires Firebase for authentication and data storage. Make sure to:
+
+1. Create a Firebase project
+2. Add your GitHub Pages domain to Firebase Authentication authorized domains
+3. Configure Firestore rules for security
 
 ## Expanding the ESLint configuration
 
