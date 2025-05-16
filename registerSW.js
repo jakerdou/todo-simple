@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/todo-simple/sw.js', { scope: '/todo-simple/' })})}
