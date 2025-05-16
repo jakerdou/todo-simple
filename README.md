@@ -7,6 +7,7 @@ A modern todo app with calendar view, built with React, TypeScript, and Firebase
 - Todo management with completion tracking
 - Monthly calendar view with todo statistics
 - Firebase authentication and data storage
+- Progressive Web App (PWA) support for iOS/Android
 - Dark theme
 
 ## Development
@@ -21,7 +22,7 @@ npm run dev
 
 ## Deployment
 
-This project is configured to deploy to GitHub Pages.
+This project is configured to deploy to GitHub Pages as a PWA.
 
 1. Update the `homepage` field in `package.json` with your GitHub username:
    ```
@@ -34,6 +35,19 @@ This project is configured to deploy to GitHub Pages.
    ```
 
 3. Or push to the main branch to trigger GitHub Actions deployment.
+
+## Using as a Progressive Web App (PWA)
+
+### iOS Installation
+1. Open the app in Safari on your iOS device
+2. Tap the Share button
+3. Scroll down and tap "Add to Home Screen"
+4. Add a name and tap "Add"
+
+### Android Installation
+1. Open the app in Chrome on your Android device
+2. You'll see an "Add to Home Screen" banner or menu option
+3. Follow the prompts to install
 
 ## Firebase Setup
 

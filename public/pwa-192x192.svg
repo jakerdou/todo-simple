@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="48" fill="#111827"/>
+  <path d="M60 96C60 89.37 65.37 84 72 84C78.63 84 84 89.37 84 96C84 102.63 78.63 108 72 108C65.37 108 60 102.63 60 96Z" fill="#22C55E"/>
+  <path d="M60 60C60 53.37 65.37 48 72 48C78.63 48 84 53.37 84 60C84 66.63 78.63 72 72 72C65.37 72 60 66.63 60 60Z" fill="#3B82F6"/>
+  <path d="M60 132C60 125.37 65.37 120 72 120C78.63 120 84 125.37 84 132C84 138.63 78.63 144 72 144C65.37 144 60 138.63 60 132Z" fill="#A3A3A3"/>
+  <rect x="93" y="54" width="54" height="12" rx="6" fill="#E5E7EB"/>
+  <rect x="93" y="90" width="54" height="12" rx="6" fill="#E5E7EB"/>
+  <rect x="93" y="126" width="54" height="12" rx="6" fill="#E5E7EB"/>
+</svg>
