@@ -136,8 +136,7 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
         
         // Fetch todos for the entire month
         const monthTodos = await fetchTodoInstances(currentUser.uid, startDateStr, endDateStr);
-        
-        // Calculate stats for each day
+          // Calculate stats for each day
         const stats: TodoStats = {};
         
         monthTodos.forEach(todo => {
@@ -151,6 +150,7 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
           }
         });
         
+        console.log('[MonthGrid] Stats calculated:', stats);
         setTodoStats(stats);
       } catch (err) {
         console.error('Error loading monthly todos:', err);

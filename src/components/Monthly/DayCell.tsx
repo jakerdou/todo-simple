@@ -19,6 +19,9 @@ export default function DayCell({
   isCurrentDay = false,
   date
 }: DayCellProps) {  
+    if (totalTodos > 0) {
+      console.log(`[DayCell] Day ${day} has ${completedTodos}/${totalTodos} todos`);
+    }
     return (    
         <div 
         className={`

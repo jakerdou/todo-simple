@@ -1,4 +1,6 @@
 import { useAuth } from '../../AuthContext';
+// Import the app version from our version file
+import { APP_VERSION } from '../../version';
 
 export default function ProfileTab() {
   const { currentUser, logout } = useAuth();
@@ -28,7 +30,12 @@ export default function ProfileTab() {
           >
             Logout
           </button>
-        </div>
+        </div>      </div>
+      
+      <div className="mt-6">
+        <p className="text-center text-gray-500 text-sm">
+          Version {APP_VERSION}
+        </p>
       </div>
     </div>
   );
