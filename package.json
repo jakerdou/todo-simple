@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://YOUR_GITHUB_USERNAME.github.io/todo-simple",
+  "homepage": "https://jakerdou.github.io/todo-simple",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
