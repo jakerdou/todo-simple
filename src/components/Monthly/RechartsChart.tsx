@@ -4,9 +4,10 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 interface RechartsChartProps {
   completed: number;
   total: number;
+  isCurrentDay?: boolean;
 }
 
-const RechartsChartComponent: React.FC<RechartsChartProps> = ({ completed, total }) => {
+const RechartsChartComponent: React.FC<RechartsChartProps> = ({ completed, total, isCurrentDay = false }) => {
   if (total === 0) return null;
   
   // Data needs to be in the format Recharts expects
@@ -15,7 +16,7 @@ const RechartsChartComponent: React.FC<RechartsChartProps> = ({ completed, total
     { name: 'Remaining', value: total - completed }
   ];
     // Colors for the pie chart segments
-  const COLORS = ['#22c55e', '#ef4444']; // Green for completed, Red for remaining
+  const COLORS = ['#22c55e', isCurrentDay ? '#6b7280' : '#ef4444']; // Green for completed, Grey for remaining on today's date, otherwise Red
   
   return (
     <div className="relative w-6 h-6">
