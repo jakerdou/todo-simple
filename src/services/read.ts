@@ -16,11 +16,14 @@ export const fetchTodoInstances = async (
   endDate?: string
 ): Promise<TodoItem[]> => {
   try {
+    console.log(`[fetchTodoInstances] Called with userId: ${userId}, startDate: ${startDate}, endDate: ${endDate || 'not provided'}`);
+    
     const instancesCollectionRef = collection(db, `users/${userId}/instances`);
     let q;
     
     if (endDate) {
       // If endDate is provided, fetch todos between startDate and endDate (inclusive)
+      // console.log(`[fetchTodoInstances] Executing range query from ${startDate} to ${endDate}`);
       q = query(
         instancesCollectionRef,
         where('date', '>=', startDate),
@@ -29,14 +32,15 @@ export const fetchTodoInstances = async (
       );
     } else {
       // If only startDate is provided, fetch todos for that specific date
+      // console.log(`[fetchTodoInstances] Executing single date query for ${startDate}`);
       q = query(
         instancesCollectionRef,
         where('date', '==', startDate),
         orderBy('date', 'asc')
       );
-    }
-    
+    }    
     const querySnapshot = await getDocs(q);
+    // console.log(`[fetchTodoInstances] Query returned ${querySnapshot.size} documents`);
     
     const todos: TodoItem[] = [];
     querySnapshot.forEach((doc) => {
@@ -52,9 +56,14 @@ export const fetchTodoInstances = async (
       });
     });
     
+    // console.log(`[fetchTodoInstances] Processed ${todos.length} todos`);
+    // if (todos.length > 0) {
+    //   console.log(`[fetchTodoInstances] Sample todo: ${JSON.stringify(todos[0], null, 2)}`);
+    // }
+    
     return todos;
   } catch (error) {
-    console.error('Error fetching todos: ', error);
+    console.error('[fetchTodoInstances] Error fetching todos: ', error);
     throw error;
   }
 };

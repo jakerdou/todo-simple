@@ -67,16 +67,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   function logout() {
     return signOut(auth);
-  }
-  useEffect(() => {
+  }  useEffect(() => {
+    console.log('[AuthContext] Setting up auth state listener');
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log('[AuthContext] User authenticated:', user.uid);
         // Only store email and uid
         setCurrentUser({
           email: user.email,
           uid: user.uid
         });
       } else {
+        console.log('[AuthContext] No user authenticated');
         setCurrentUser(null);
       }
       setLoading(false);

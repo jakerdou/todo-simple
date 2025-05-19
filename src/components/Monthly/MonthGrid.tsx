@@ -107,19 +107,25 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
   
   // Format month name
   const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
-    // Fetch todos for the entire month when the month changes
+  // Fetch todos for the entire month when the month changes
   useEffect(() => {
     if (!currentUser) return;
     
-    // Skip the initial duplicate call from React StrictMode
+    // In development, React StrictMode causes double rendering
+    // In production, we should always fetch data regardless
+    const shouldFetchData = !isInitialRender.current || process.env.NODE_ENV === 'production';
+    
     if (isInitialRender.current) {
       isInitialRender.current = false;
-      console.log('Skipping initial duplicate call');
-      return;
+      if (!shouldFetchData) {
+        console.log('[MonthGrid] Skipping initial call in development mode');
+        return;
+      }
     }
     
     const fetchMonthlyTodos = async () => {
       try {
+        console.log('[MonthGrid] Starting to fetch monthly todos');
         setLoading(true);
         
         // Create date for first day of the month
@@ -127,19 +133,28 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
         // Create date for last day of the month
         const lastDay = new Date(year, month + 1, 0);
         
+        console.log(`[MonthGrid] Date range: ${formatDateString(firstDay)} to ${formatDateString(lastDay)}`);
+        
         // Refresh recurring todos for the month range
         await refreshRecurringTodoInstances(currentUser.uid, firstDay, lastDay);
+        console.log('[MonthGrid] Refreshed recurring todos');
         
         // Format dates for API
         const startDateStr = formatDateString(firstDay);
         const endDateStr = formatDateString(lastDay);
         
-        // Fetch todos for the entire month
+        console.log(`[MonthGrid] Fetching todos for date range: ${startDateStr} to ${endDateStr}`);
+          // Fetch todos for the entire month
         const monthTodos = await fetchTodoInstances(currentUser.uid, startDateStr, endDateStr);
-          // Calculate stats for each day
+        console.log(`[MonthGrid] Fetched ${monthTodos.length} todos for month`);
+        console.log('[MonthGrid] First few todos:', monthTodos.slice(0, 3));
+        
+        // Calculate stats for each day
         const stats: TodoStats = {};
         
+        console.log('[MonthGrid] Processing todos to calculate stats');
         monthTodos.forEach(todo => {
+          console.log(`[MonthGrid] Processing todo: ${todo.name}, date: ${todo.date}, completed: ${todo.completed}`);
           if (!stats[todo.date]) {
             stats[todo.date] = { total: 0, completed: 0 };
           }
@@ -149,9 +164,13 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
             stats[todo.date].completed++;
           }
         });
-        
-        console.log('[MonthGrid] Stats calculated:', stats);
+          console.log('[MonthGrid] Stats calculated:', JSON.stringify(stats, null, 2));
         setTodoStats(stats);
+        
+        // Add a timeout to check if todoStats is updated correctly after setState
+        setTimeout(() => {
+          console.log('[MonthGrid] TodoStats state after update:', JSON.stringify(todoStats, null, 2));
+        }, 100);
       } catch (err) {
         console.error('Error loading monthly todos:', err);
       } finally {
@@ -187,6 +206,7 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
       console.log('Cannot navigate more than 3 months into the future');
     }
   };
+  console.log('todoStats:', todoStats);
   return (
     <div className="flex flex-col h-full text-white bg-gray-900">      {/* Month navigation */}      <div className="flex justify-between items-center mb-4">
         <button 
@@ -256,6 +276,8 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
             // Navigate to Todo tab with the selected date
             if (onDayClick) onDayClick(newDate);
           };
+
+          // console.log(`[MonthGrid] Rendering day ${day.day} (${day.month + 1}/${day.year}) with stats:`, stats);
           
           return (
             <div key={`${day.month}-${day.day}-${index}`} className="h-full relative">              

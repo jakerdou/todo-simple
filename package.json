@@ -1,7 +1,7 @@
 {
   "name": "todo-simple",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "homepage": "https://jakerdou.github.io/todo-simple",
   "scripts": {
@@ -19,6 +19,7 @@
     "firebase": "^11.7.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "recharts": "^2.15.3",
     "rrule": "^2.8.1",
     "tailwindcss": "^4.1.6"
   },
