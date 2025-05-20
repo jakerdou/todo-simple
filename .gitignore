@@ -34,6 +34,7 @@ firebase-debug.log
 firebase-debug.*.log
 .firebase/
 .firebaserc
+orphaned-instances.log
 
 # Build and coverage directories
 coverage
@@ -46,3 +47,5 @@ build
 .cache
 
 /src/firebase.ts
+
+todo-app-c4eae-firebase-adminsdk-fbsvc-f63841534b.json

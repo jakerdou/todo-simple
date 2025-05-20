@@ -45,10 +45,11 @@ export default function DayCell({
             </div>      
           )}      
           {totalTodos > 0 && date && (
-            <div className="mt-2 flex justify-center">                {/* Only show the Recharts pie chart for current date or past dates */}
-                {(date <= new Date() || isCurrentDay) && (
-                    <RechartsChart completed={completedTodos} total={totalTodos} isCurrentDay={isCurrentDay} />
-                )}
+            <div className="mt-2 flex justify-center">                
+              {/* Only show the Recharts pie chart for current date or past dates */}
+              {(date <= new Date() || isCurrentDay) && (
+                  <RechartsChart completed={completedTodos} total={totalTodos} isCurrentDay={isCurrentDay} />
+              )}
             </div>
           )}
           <div className="flex-grow"></div>

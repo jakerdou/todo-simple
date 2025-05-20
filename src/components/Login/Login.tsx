@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '../../AuthContext';
 
-export default function Login() {
+interface LoginProps {
+  onBackToLanding?: () => void;
+}
+
+export default function Login({ onBackToLanding }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
@@ -55,13 +59,26 @@ export default function Login() {
       }
     } finally {
       setLoading(false);
-    }
-  }  return (
+    }  }  return (
     <div className="flex justify-center items-center min-h-screen bg-gray-900 p-4">
       <div className="w-full max-w-md bg-gray-800 rounded-lg shadow-md overflow-hidden p-6">
-        <h2 className="text-2xl font-bold text-center mb-6 text-white">
-          {isLogin ? 'Login' : 'Sign Up'}
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          {onBackToLanding && (
+            <button 
+              onClick={onBackToLanding}
+              className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700 transition-colors"
+              aria-label="Back to landing page"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+          )}
+          <h2 className="text-2xl font-bold text-center flex-1 text-white">
+            {isLogin ? 'Login to EasyHabits' : 'Join EasyHabits'}
+          </h2>
+          <div className="w-5"></div> {/* Spacer for balance */}
+        </div>
         
         {error && (
           <div className="mb-4 p-3 bg-red-900/30 border border-red-700 text-red-400 rounded-md text-sm">
@@ -80,7 +97,8 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="block w-full rounded-md border border-gray-600 bg-gray-700 py-2 px-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="block w-full rounded-md border border-gray-600 bg-gray-700 py-2 px-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+              placeholder="your@email.com"
             />
           </div>
           
@@ -94,26 +112,33 @@ export default function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="block w-full rounded-md border border-gray-600 bg-gray-700 py-2 px-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="block w-full rounded-md border border-gray-600 bg-gray-700 py-2 px-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+              placeholder="••••••••"
             />
           </div>
           
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Processing...' : isLogin ? 'Login' : 'Sign Up'}
+            {loading ? 'Processing...' : isLogin ? 'Login' : 'Create Account'}
           </button>
         </form>
         
         <div className="mt-6 text-center">
           <button 
             onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-400 hover:text-blue-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-2 py-1"
+            className="text-green-400 hover:text-green-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 rounded-md px-2 py-1"
           >
-            {isLogin ? 'Need an account? Sign Up' : 'Already have an account? Login'}
+            {isLogin ? 'Need an account? Create one now' : 'Already have an account? Login'}
           </button>
+        </div>
+        
+        <div className="mt-4 pt-4 border-t border-gray-700 text-center">
+          <p className="text-sm text-gray-400">
+            {isLogin ? 'Welcome back to your habit tracking journey' : 'Start building better habits today'}
+          </p>
         </div>
       </div>
     </div>

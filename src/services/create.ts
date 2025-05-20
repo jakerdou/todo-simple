@@ -167,7 +167,7 @@ export const generateTodoInstances = async (
     
     await Promise.all(createInstancePromises);
     
-    console.log(`Generated ${occurencesCreated} todo instances`);
+    // console.log(`Generated ${occurencesCreated} todo instances`);
   } catch (error) {
     console.error('Error generating todo instances: ', error);
     throw error;
@@ -207,7 +207,7 @@ export const refreshRecurringTodoInstances = async (
     );
     
     await Promise.all(refreshPromises);
-    console.log(`Refreshed instances for ${patterns.length} recurrence patterns.`);
+    // console.log(`Refreshed instances for ${patterns.length} recurrence patterns.`);
   } catch (error) {
     console.error('Error refreshing recurring todo instances: ', error);
     throw error;

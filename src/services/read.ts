@@ -16,7 +16,7 @@ export const fetchTodoInstances = async (
   endDate?: string
 ): Promise<TodoItem[]> => {
   try {
-    console.log(`[fetchTodoInstances] Called with userId: ${userId}, startDate: ${startDate}, endDate: ${endDate || 'not provided'}`);
+    // console.log(`[fetchTodoInstances] Called with userId: ${userId}, startDate: ${startDate}, endDate: ${endDate || 'not provided'}`);
     
     const instancesCollectionRef = collection(db, `users/${userId}/instances`);
     let q;
@@ -54,12 +54,8 @@ export const fetchTodoInstances = async (
         recurrenceId: data.recurrenceId || null,
         createdAt: data.createdAt
       });
+      
     });
-    
-    // console.log(`[fetchTodoInstances] Processed ${todos.length} todos`);
-    // if (todos.length > 0) {
-    //   console.log(`[fetchTodoInstances] Sample todo: ${JSON.stringify(todos[0], null, 2)}`);
-    // }
     
     return todos;
   } catch (error) {

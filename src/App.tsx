@@ -7,6 +7,7 @@ import MonthlyTab from './components/Monthly/MonthlyTab';
 import ProfileTab from './components/Profile/ProfileTab';
 import IOSDetector from './components/UI/IOSDetector';
 import InstallPrompt from './components/UI/InstallPrompt';
+import BasicLandingPage from './components/Landing/BasicLandingPage';
 
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState('todo');
@@ -46,19 +47,19 @@ function DashboardContent() {
         {/* Bottom Tabs */}
         <div className="flex border-t" style={{ boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)' }}>
           <button
-            className={`flex-1 py-4 text-center ${activeTab === 'todo' ? 'text-blue-500 border-t-2 border-blue-500' : 'text-gray-500'}`}
+            className={`flex-1 py-4 text-center ${activeTab === 'todo' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
             onClick={() => setActiveTab('todo')}
           >
-            Todo
+            Habits
           </button>
           <button
-            className={`flex-1 py-4 text-center ${activeTab === 'monthly' ? 'text-blue-500 border-t-2 border-blue-500' : 'text-gray-500'}`}
+            className={`flex-1 py-4 text-center ${activeTab === 'monthly' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
             onClick={() => setActiveTab('monthly')}
           >
-            Monthly
+            Calendar
           </button>
           <button
-            className={`flex-1 py-4 text-center ${activeTab === 'profile' ? 'text-blue-500 border-t-2 border-blue-500' : 'text-gray-500'}`}
+            className={`flex-1 py-4 text-center ${activeTab === 'profile' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
             onClick={() => setActiveTab('profile')}
           >
             Profile
@@ -71,16 +72,28 @@ function DashboardContent() {
 
 function AppContent() {
   const { currentUser, loading } = useAuth();
+  const [showLanding, setShowLanding] = useState(true);
   
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-900">
-        <div className="text-blue-400 text-xl font-medium">Loading...</div>
+        <div className="text-green-500 text-xl font-medium flex flex-col items-center">
+          <div className="mb-3 h-6 w-6 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></div>
+          <div>Loading EasyHabits...</div>
+        </div>
       </div>
     );
   }
   
-  return currentUser ? <DashboardContent /> : <Login />;
+  // Show landing page if user is not logged in and landing is active
+  if (!currentUser) {
+    return showLanding 
+      ? <BasicLandingPage onGetStarted={() => setShowLanding(false)} /> 
+      : <Login onBackToLanding={() => setShowLanding(true)} />;
+  }
+  
+  // If user is logged in, show dashboard
+  return <DashboardContent />;
 }
 
 function App() {

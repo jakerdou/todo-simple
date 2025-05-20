@@ -25,10 +25,12 @@ export default function TodoTab({ selectedDate, setSelectedDate }: TodoTabProps)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
-
-  // Format date as YYYY-MM-DD for Firestore query
+  // Format date as YYYY-MM-DD for Firestore query using local time
   const getDateString = (date: Date): string => {
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
   // Fetch todos when the component mounts, when the dialog closes, or when selected date changes
   useEffect(() => {

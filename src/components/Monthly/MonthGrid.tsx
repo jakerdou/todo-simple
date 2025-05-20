@@ -118,14 +118,14 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
     if (isInitialRender.current) {
       isInitialRender.current = false;
       if (!shouldFetchData) {
-        console.log('[MonthGrid] Skipping initial call in development mode');
+        // console.log('[MonthGrid] Skipping initial call in development mode');
         return;
       }
     }
     
     const fetchMonthlyTodos = async () => {
       try {
-        console.log('[MonthGrid] Starting to fetch monthly todos');
+        // console.log('[MonthGrid] Starting to fetch monthly todos');
         setLoading(true);
         
         // Create date for first day of the month
@@ -133,28 +133,28 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
         // Create date for last day of the month
         const lastDay = new Date(year, month + 1, 0);
         
-        console.log(`[MonthGrid] Date range: ${formatDateString(firstDay)} to ${formatDateString(lastDay)}`);
+        // console.log(`[MonthGrid] Date range: ${formatDateString(firstDay)} to ${formatDateString(lastDay)}`);
         
         // Refresh recurring todos for the month range
         await refreshRecurringTodoInstances(currentUser.uid, firstDay, lastDay);
-        console.log('[MonthGrid] Refreshed recurring todos');
+        // console.log('[MonthGrid] Refreshed recurring todos');
         
         // Format dates for API
         const startDateStr = formatDateString(firstDay);
         const endDateStr = formatDateString(lastDay);
         
-        console.log(`[MonthGrid] Fetching todos for date range: ${startDateStr} to ${endDateStr}`);
+        // console.log(`[MonthGrid] Fetching todos for date range: ${startDateStr} to ${endDateStr}`);
           // Fetch todos for the entire month
         const monthTodos = await fetchTodoInstances(currentUser.uid, startDateStr, endDateStr);
-        console.log(`[MonthGrid] Fetched ${monthTodos.length} todos for month`);
-        console.log('[MonthGrid] First few todos:', monthTodos.slice(0, 3));
+        // console.log(`[MonthGrid] Fetched ${monthTodos.length} todos for month`);
+        // console.log('[MonthGrid] First few todos:', monthTodos.slice(0, 3));
         
         // Calculate stats for each day
         const stats: TodoStats = {};
         
-        console.log('[MonthGrid] Processing todos to calculate stats');
+        // console.log('[MonthGrid] Processing todos to calculate stats');
         monthTodos.forEach(todo => {
-          console.log(`[MonthGrid] Processing todo: ${todo.name}, date: ${todo.date}, completed: ${todo.completed}`);
+          // console.log(`[MonthGrid] Processing todo: ${todo.name}, date: ${todo.date}, completed: ${todo.completed}`);
           if (!stats[todo.date]) {
             stats[todo.date] = { total: 0, completed: 0 };
           }
@@ -164,13 +164,13 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
             stats[todo.date].completed++;
           }
         });
-          console.log('[MonthGrid] Stats calculated:', JSON.stringify(stats, null, 2));
+          // console.log('[MonthGrid] Stats calculated:', JSON.stringify(stats, null, 2));
         setTodoStats(stats);
         
         // Add a timeout to check if todoStats is updated correctly after setState
-        setTimeout(() => {
-          console.log('[MonthGrid] TodoStats state after update:', JSON.stringify(todoStats, null, 2));
-        }, 100);
+        // setTimeout(() => {
+        //   console.log('[MonthGrid] TodoStats state after update:', JSON.stringify(todoStats, null, 2));
+        // }, 100);
       } catch (err) {
         console.error('Error loading monthly todos:', err);
       } finally {
@@ -179,7 +179,6 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
     };
     
     fetchMonthlyTodos();
-    console.log('Fetching todos for month:', month, 'year:', year);
   }, [currentUser, month, year]);
   // Handle navigation to previous month
   const handlePrevMonth = () => {
@@ -203,10 +202,10 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
       if (onDateChange) onDateChange(targetDate);
     } else {
       // Provide user feedback with tooltip (handled by UI)
-      console.log('Cannot navigate more than 3 months into the future');
+      // console.log('Cannot navigate more than 3 months into the future');
     }
   };
-  console.log('todoStats:', todoStats);
+  // console.log('todoStats:', todoStats);
   return (
     <div className="flex flex-col h-full text-white bg-gray-900">      {/* Month navigation */}      <div className="flex justify-between items-center mb-4">
         <button 
