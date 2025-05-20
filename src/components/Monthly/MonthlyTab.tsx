@@ -13,7 +13,6 @@ export default function MonthlyTab({ selectedDate, setSelectedDate, switchToTodo
   
   return (
     <div className="p-4 flex flex-col h-full bg-gray-900 transition-all duration-300">
-      <h2 className="text-xl font-bold mb-4 text-white">Monthly View</h2>
       <div className="flex-grow flex flex-col">
         <MonthGrid 
           date={selectedDate} 

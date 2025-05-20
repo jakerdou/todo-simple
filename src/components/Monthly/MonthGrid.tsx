@@ -207,97 +207,103 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
   };
   // console.log('todoStats:', todoStats);
   return (
-    <div className="flex flex-col h-full text-white bg-gray-900">      {/* Month navigation */}      <div className="flex justify-between items-center mb-4">
-        <button 
-          onClick={handlePrevMonth}
-          className="p-2 text-gray-400 hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-full"
-          aria-label="Previous month"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-          </svg>
-        </button>
-        <h2 className="text-xl font-bold">{monthName} {year}</h2>
-        <div className="relative group">
-          <button 
-            onClick={handleNextMonth}
-            className={`p-2 ${
-              new Date(year, month + 1, 1) <= new Date(todayDate.current.getFullYear(), todayDate.current.getMonth() + 3, 1)
-              ? 'text-gray-400 hover:text-blue-400'
-              : 'text-gray-600 cursor-not-allowed'
-            } focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-full`}
-            aria-label="Next month"
-            disabled={new Date(year, month + 1, 1) > new Date(todayDate.current.getFullYear(), todayDate.current.getMonth() + 3, 1)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-            </svg>
-          </button>
-          {new Date(year, month + 1, 1) > new Date(todayDate.current.getFullYear(), todayDate.current.getMonth() + 3, 1) && (
-            <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-xs text-white p-1 rounded shadow-lg whitespace-nowrap">
-              Cannot navigate beyond 3 months from today
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Weekday headers */}
-      <div className="grid grid-cols-7 gap-1 mb-1">
-        {weekDays.map(day => (
-          <div 
-            key={day} 
-            className="py-2 text-center font-semibold text-gray-300"
-          >
-            {day}
+    <div className="flex flex-col h-full text-white bg-gray-900">
+      {loading ? (
+        <div className="flex justify-center items-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
           </div>
-        ))}
-      </div>      {/* Calendar grid */}
-      <div 
-        className="grid grid-cols-7 grid-rows-5 gap-1 flex-grow transition-all duration-200"
-        style={{ height: 'calc(100% - 80px)' }}
-      >{days.map((day, index) => {
-          // Create date string for this day to match todo.date format
-          const dateStr = formatDateString(new Date(day.year, day.month, day.day));
-          const stats = todoStats[dateStr] || { total: 0, completed: 0 };
-          
-          // Check if this is the current day (today)
-          const today = new Date();
-          const isCurrentDay = day.day === today.getDate() && 
-                              day.month === today.getMonth() && 
-                              day.year === today.getFullYear();
-            
-          // Handler for day cell click
-          const handleDayClick = () => {
-            const newDate = new Date(day.year, day.month, day.day);
-            setCurrentDate(newDate);
-            if (onDateChange) onDateChange(newDate);
-            
-            // Navigate to Todo tab with the selected date
-            if (onDayClick) onDayClick(newDate);
-          };
-
-          // console.log(`[MonthGrid] Rendering day ${day.day} (${day.month + 1}/${day.year}) with stats:`, stats);
-          
-          return (
-            <div key={`${day.month}-${day.day}-${index}`} className="h-full relative">              
-                <DayCell 
-                    day={day.day} 
-                    isCurrentMonth={day.isCurrentMonth}
-                    completedTodos={stats.completed}
-                    totalTodos={stats.total}
-                    onClick={handleDayClick}
-                    isCurrentDay={isCurrentDay}
-                    date={new Date(day.year, day.month, day.day)}
-                />
+      ) : (
+        <div>
+          {/* Month navigation */}      
+          <div className="flex justify-between items-center mb-4">
+            <button 
+              onClick={handlePrevMonth}
+              className="p-2 text-gray-400 hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-full"
+              aria-label="Previous month"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </button>
+            <h2 className="text-xl font-bold">{monthName} {year}</h2>
+            <div className="relative group">
+              <button 
+                onClick={handleNextMonth}
+                className={`p-2 ${
+                  new Date(year, month + 1, 1) <= new Date(todayDate.current.getFullYear(), todayDate.current.getMonth() + 3, 1)
+                  ? 'text-gray-400 hover:text-blue-400'
+                  : 'text-gray-600 cursor-not-allowed'
+                } focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-full`}
+                aria-label="Next month"
+                disabled={new Date(year, month + 1, 1) > new Date(todayDate.current.getFullYear(), todayDate.current.getMonth() + 3, 1)}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
+              </button>
+              {new Date(year, month + 1, 1) > new Date(todayDate.current.getFullYear(), todayDate.current.getMonth() + 3, 1) && (
+                <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-xs text-white p-1 rounded shadow-lg whitespace-nowrap">
+                  Cannot navigate beyond 3 months from today
+                </div>
+              )}
             </div>
-          );
-        })}
-      </div>
-        {loading && (
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-10">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+          
+          {/* Weekday headers */}
+          <div className="grid grid-cols-7 gap-1 mb-1">
+            {weekDays.map(day => (
+              <div 
+                key={day} 
+                className="py-2 text-center font-semibold text-gray-300"
+              >
+                {day}
+              </div>
+            ))}
+          </div>      
+          {/* Calendar grid */}
+          <div 
+            className="grid grid-cols-7 grid-rows-5 gap-1 flex-grow transition-all duration-200"
+            style={{ height: 'calc(100% - 80px)' }}
+          >{days.map((day, index) => {
+              // Create date string for this day to match todo.date format
+              const dateStr = formatDateString(new Date(day.year, day.month, day.day));
+              const stats = todoStats[dateStr] || { total: 0, completed: 0 };
+              
+              // Check if this is the current day (today)
+              const today = new Date();
+              const isCurrentDay = day.day === today.getDate() && 
+                                  day.month === today.getMonth() && 
+                                  day.year === today.getFullYear();
+                
+              // Handler for day cell click
+              const handleDayClick = () => {
+                const newDate = new Date(day.year, day.month, day.day);
+                setCurrentDate(newDate);
+                if (onDateChange) onDateChange(newDate);
+                
+                // Navigate to Todo tab with the selected date
+                if (onDayClick) onDayClick(newDate);
+              };
+
+              // console.log(`[MonthGrid] Rendering day ${day.day} (${day.month + 1}/${day.year}) with stats:`, stats);
+              
+              return (
+                <div key={`${day.month}-${day.day}-${index}`} className="h-full relative">              
+                    <DayCell 
+                        day={day.day} 
+                        isCurrentMonth={day.isCurrentMonth}
+                        completedTodos={stats.completed}
+                        totalTodos={stats.total}
+                        onClick={handleDayClick}
+                        isCurrentDay={isCurrentDay}
+                        date={new Date(day.year, day.month, day.day)}
+                    />
+                </div>
+              );
+            })}
+          </div>
         </div>
-      )}
+      )}      
     </div>
   );
 }

@@ -14,9 +14,7 @@ export default function ProfileTab() {
   }
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Profile</h2>
-      
+    <div className="p-4">      
       <div className="bg-gray-100 p-4 rounded-lg dark:bg-gray-800">
         <div className="mb-4">
           <p className="text-sm text-gray-500 mb-1">Email</p>

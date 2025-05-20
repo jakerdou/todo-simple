@@ -122,9 +122,7 @@ export default function TodoTab({ selectedDate, setSelectedDate }: TodoTabProps)
 
   return (
     <div className="p-4 relative h-full flex flex-col">
-      <div className="flex-1">
-        <h2 className="text-xl font-bold mb-4">Todo List</h2>
-        
+      <div className="flex-1">       
         {loading ? (
           <div className="flex justify-center items-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
@@ -222,7 +220,8 @@ export default function TodoTab({ selectedDate, setSelectedDate }: TodoTabProps)
                               Delete
                             </button>
                           )}
-                        </Menu.Item>                      </Menu.Items>
+                        </Menu.Item>                      
+                      </Menu.Items>
                     </Transition>
                     {/* </TransitionChild> */}
                   </Menu>

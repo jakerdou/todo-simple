@@ -56,11 +56,10 @@ export default function DatePicker({ selectedDate, onDateChange }: DatePickerPro
         </svg>
       </button>
       
-      <div className="flex flex-col items-center">
-        <h3 className={`text-sm font-medium ${isToday(selectedDate) ? 'text-blue-400' : 'text-gray-400'}`}>
+      <div className="flex flex-col items-center">        <h3 className={`text-sm font-medium ${isToday(selectedDate) ? 'text-blue-400' : 'text-gray-400'}`}>
           {selectedDate.toLocaleDateString('en-US', { 
             weekday: 'long', 
-            year: 'numeric', 
+            year: selectedDate.getFullYear() !== today.getFullYear() ? 'numeric' : undefined, 
             month: 'long', 
             day: 'numeric' 
           })}

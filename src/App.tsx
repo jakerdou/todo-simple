@@ -8,6 +8,7 @@ import ProfileTab from './components/Profile/ProfileTab';
 import IOSDetector from './components/UI/IOSDetector';
 import InstallPrompt from './components/UI/InstallPrompt';
 import BasicLandingPage from './components/Landing/BasicLandingPage';
+import { DocumentCheckIcon, CalendarIcon, UserIcon } from '@heroicons/react/24/outline';
 
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState('todo');
@@ -33,7 +34,12 @@ function DashboardContent() {
 
   return (
     <IOSDetector>
-      <div className="flex flex-col h-screen">      
+      <div className="flex flex-col h-screen">
+        {/* Header */}
+        <div className="bg-gray-800 py-3 px-4 text-center border-b border-gray-700">
+          <h1 className="text-xl font-bold text-green-500">EasyHabits</h1>
+        </div>
+        
         {/* Main Content */}
         <div className="flex-1 overflow-auto bg-gray-900">
           {activeTab === 'todo' && <TodoTab selectedDate={selectedDate} setSelectedDate={setSelectedDate} />}
@@ -47,22 +53,25 @@ function DashboardContent() {
         {/* Bottom Tabs */}
         <div className="flex border-t" style={{ boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.1)' }}>
           <button
-            className={`flex-1 py-4 text-center ${activeTab === 'todo' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
+            className={`flex-1 py-2 text-center flex flex-col items-center ${activeTab === 'todo' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
             onClick={() => setActiveTab('todo')}
           >
-            Habits
+            <DocumentCheckIcon className="h-6 w-6 mb-1" />
+            <span>Habits</span>
           </button>
           <button
-            className={`flex-1 py-4 text-center ${activeTab === 'monthly' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
+            className={`flex-1 py-2 text-center flex flex-col items-center ${activeTab === 'monthly' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
             onClick={() => setActiveTab('monthly')}
           >
-            Calendar
+            <CalendarIcon className="h-6 w-6 mb-1" />
+            <span>Calendar</span>
           </button>
           <button
-            className={`flex-1 py-4 text-center ${activeTab === 'profile' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
+            className={`flex-1 py-2 text-center flex flex-col items-center ${activeTab === 'profile' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
             onClick={() => setActiveTab('profile')}
           >
-            Profile
+            <UserIcon className="h-6 w-6 mb-1" />
+            <span>Profile</span>
           </button>
         </div>
       </div>
