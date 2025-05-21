@@ -8,7 +8,7 @@ import ProfileTab from './components/Profile/ProfileTab';
 import IOSDetector from './components/UI/IOSDetector';
 import InstallPrompt from './components/UI/InstallPrompt';
 import BasicLandingPage from './components/Landing/BasicLandingPage';
-import { DocumentCheckIcon, CalendarIcon, UserIcon } from '@heroicons/react/24/outline';
+import { ListBulletIcon, CalendarIcon, UserIcon } from '@heroicons/react/24/outline';
 
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState('todo');
@@ -56,7 +56,7 @@ function DashboardContent() {
             className={`flex-1 py-2 text-center flex flex-col items-center ${activeTab === 'todo' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
             onClick={() => setActiveTab('todo')}
           >
-            <DocumentCheckIcon className="h-6 w-6 mb-1" />
+            <ListBulletIcon className="h-6 w-6 mb-1" />
             <span>Habits</span>
           </button>
           <button

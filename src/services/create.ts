@@ -4,6 +4,14 @@ import type { TodoItem, RecurrencePattern } from '../models';
 import { RRule } from 'rrule';
 
 /**
+ * Helper function to get today's date in YYYY-MM-DD format
+ */
+const getTodayDate = (): string => {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+};
+
+/**
  * Adds a new todo instance to the user's instances collection in Firestore
  * @param userId - The ID of the current user
  * @param name - The name/title of the todo item
@@ -23,7 +31,8 @@ export const addTodoInstance = async (
       completed: false,
       isRecurring: false,
       recurrenceId: null,
-      createdAt: serverTimestamp() as Timestamp
+      createdAt: serverTimestamp() as Timestamp,
+      editedAt: null
     };
 
     // Get reference to the user's instances collection
@@ -45,19 +54,23 @@ export const addTodoInstance = async (
  * @param userId - The ID of the current user
  * @param name - The name/title of the todo
  * @param rruleString - The RRule string representing the recurrence pattern
+ * @param startsOn - The date when the recurrence should start (YYYY-MM-DD format)
  * @returns Promise with the recurrence pattern document reference
  */
 export const addRecurringTodo = async (
   userId: string,
   name: string,
   rruleString: string,
+  startsOn: string,
 ) => {
   try {
     // Create the recurrence pattern
     const recurrenceData: RecurrencePattern = {
       name,
       rrule: rruleString,
-      createdAt: serverTimestamp() as Timestamp
+      startsOn,
+      createdAt: serverTimestamp() as Timestamp,
+      editedAt: null
     };
 
     // Get reference to the user's recurrences collection
@@ -67,20 +80,26 @@ export const addRecurringTodo = async (
     const recurrenceDocRef = await addDoc(recurrencesCollectionRef, recurrenceData);
     const recurrenceId = recurrenceDocRef.id;
     console.log('Recurrence pattern added with ID: ', recurrenceId);
-    
-    // Generate at least today's instance to ensure it appears immediately
+      // Generate at least today's instance to ensure it appears immediately
     const today = new Date();
     
     // Get just today's date without time component
     const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    // We only need to generate instances for today
     
+    // Convert startsOn string to Date object
+    const startsOnDate = new Date(startsOn);
+    startsOnDate.setHours(0, 0, 0, 0);
+    
+    // Use the later of today or startsOn date as our generation start date
+    const generationStartDate = startsOnDate > todayStart ? startsOnDate : todayStart;
+    
+    // Generate instances starting from the appropriate date
     await generateTodoInstances(
       userId,
       recurrenceId,
       name,
       rruleString,
-      todayStart // Only generate for today
+      generationStartDate
     );
     
     return recurrenceDocRef;  } catch (error) {
@@ -97,6 +116,7 @@ export const addRecurringTodo = async (
  * @param rruleString - The RRule string representing the recurrence pattern
  * @param startDate - Date to start generating from (defaults to today)
  * @param endDate - Optional end date to stop generating at
+ * @param startsOnDate - Optional date when the recurrence officially starts (to avoid generating instances before this date)
  */
 export const generateTodoInstances = async (
   userId: string,
@@ -104,7 +124,8 @@ export const generateTodoInstances = async (
   name: string,
   rruleString: string,
   startDate: Date = new Date(),
-  endDate?: Date
+  endDate?: Date,
+  startsOnDate?: Date
 ) => {
   try {
     // Parse the RRule string
@@ -113,6 +134,15 @@ export const generateTodoInstances = async (
     // Adjust start date to beginning of day to ensure we capture all events
     const adjustedStartDate = new Date(startDate);
     adjustedStartDate.setHours(0, 0, 0, 0);
+    
+    // If startsOnDate is provided, use the later of adjustedStartDate or startsOnDate
+    if (startsOnDate) {
+      const adjustedStartsOnDate = new Date(startsOnDate);
+      adjustedStartsOnDate.setHours(0, 0, 0, 0);
+      if (adjustedStartsOnDate > adjustedStartDate) {
+        adjustedStartDate.setTime(adjustedStartsOnDate.getTime());
+      }
+    }
       
     // Get occurrences based on the provided parameters
     let occurrences: Date[];
@@ -152,13 +182,14 @@ export const generateTodoInstances = async (
       }
       
       // Create recurring todo instance
-      const todoData = {
+      const todoData: TodoItem = {
         name,
         date: dateString,
         completed: false,
         isRecurring: true,
         recurrenceId,
-        createdAt: serverTimestamp() as Timestamp
+        createdAt: serverTimestamp() as Timestamp,
+        editedAt: null
       };
       
       occurencesCreated++;
@@ -193,18 +224,19 @@ export const refreshRecurringTodoInstances = async (
       console.log('No recurrence patterns found.');
       return;
     }
-    
-    // Generate instances for each pattern for the specified date
-    const refreshPromises = patterns.map(pattern => 
-      generateTodoInstances(
+      // Generate instances for each pattern for the specified date
+    const refreshPromises = patterns.map(pattern => {
+      const startsOnDate = new Date(pattern.startsOn);
+      return generateTodoInstances(
         userId,
         pattern.id!,
         pattern.name,
         pattern.rrule,
         startDate,
-        endDate
-      )
-    );
+        endDate,
+        startsOnDate // Pass the startsOn date from the pattern
+      );
+    });
     
     await Promise.all(refreshPromises);
     // console.log(`Refreshed instances for ${patterns.length} recurrence patterns.`);
@@ -225,15 +257,16 @@ export const fetchRecurrencePatterns = async (userId: string): Promise<Recurrenc
     const q = query(recurrencesCollectionRef, orderBy('createdAt', 'desc'));
     
     const querySnapshot = await getDocs(q);
-    
-    const patterns: RecurrencePattern[] = [];
+      const patterns: RecurrencePattern[] = [];
     querySnapshot.forEach((doc) => {
       const data = doc.data();
       patterns.push({
         id: doc.id,
         name: data.name,
         rrule: data.rrule,
-        createdAt: data.createdAt
+        startsOn: data.startsOn || getTodayDate(), // Default to today if not found (for backward compatibility)
+        createdAt: data.createdAt,
+        editedAt: data.editedAt || null
       });
     });
     

@@ -8,15 +8,22 @@ interface LoginProps {
 export default function Login({ onBackToLanding }: LoginProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { login, signup } = useAuth();
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+    
+    // Check if passwords match for signup
+    if (!isLogin && password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    
     setLoading(true);
       try {
       if (isLogin) {
@@ -101,8 +108,7 @@ export default function Login({ onBackToLanding }: LoginProps) {
               placeholder="your@email.com"
             />
           </div>
-          
-          <div>
+            <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
               Password
             </label>
@@ -116,6 +122,23 @@ export default function Login({ onBackToLanding }: LoginProps) {
               placeholder="••••••••"
             />
           </div>
+          
+          {!isLogin && (
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="block w-full rounded-md border border-gray-600 bg-gray-700 py-2 px-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                placeholder="••••••••"
+              />
+            </div>
+          )}
           
           <button 
             type="submit" 
@@ -133,12 +156,6 @@ export default function Login({ onBackToLanding }: LoginProps) {
           >
             {isLogin ? 'Need an account? Create one now' : 'Already have an account? Login'}
           </button>
-        </div>
-        
-        <div className="mt-4 pt-4 border-t border-gray-700 text-center">
-          <p className="text-sm text-gray-400">
-            {isLogin ? 'Welcome back to your habit tracking journey' : 'Start building better habits today'}
-          </p>
         </div>
       </div>
     </div>
