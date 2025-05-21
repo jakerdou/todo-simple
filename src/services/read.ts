@@ -52,7 +52,8 @@ export const fetchTodoInstances = async (
         completed: data.completed,
         isRecurring: data.isRecurring || false,
         recurrenceId: data.recurrenceId || null,
-        createdAt: data.createdAt
+        createdAt: data.createdAt,
+        editedAt: data.editedAt || null
       });
       
     });
@@ -83,7 +84,9 @@ export const fetchRecurrencePatterns = async (userId: string): Promise<Recurrenc
         id: doc.id,
         name: data.name,
         rrule: data.rrule,
-        createdAt: data.createdAt
+        createdAt: data.createdAt,
+        editedAt: data.editedAt || null,
+        startsOn: data.startsOn
       });
     });
     
