@@ -20,6 +20,5 @@ db structure -
 
 
 
-implement edit for non recurring habit, we just let the user edit the date and the name, and just edit the instance in the db, if the user wants to edit a recurring todo, we ask if they want to edit just this instnace or the whole recurrence, if they want to edit just this instnace we do the same for a non recurring habit, if they want to edit the recurrence we let them edit the name and recurrence and then delete all future instances and edi the recurrence in the db. need to make sure to do something if future instances are already updated for that recurrence, maybe look at editedat field and see if it's edited, then ask "this recurrence has future instances that have been edited, changing this recurrence will revert those edits to reflect your new changes"
-
-need to make sure that user cant create habits in the past
+recurring starts on date doesn't work
+edit recurrence doesnt work, it shows random recurrence rule

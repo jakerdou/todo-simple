@@ -5,10 +5,11 @@ import Login from './components/Login/Login'
 import TodoTab from './components/Todo/TodoTab';
 import MonthlyTab from './components/Monthly/MonthlyTab';
 import ProfileTab from './components/Profile/ProfileTab';
+import MetricsTab from './components/Metrics/MetricsTab';
 import IOSDetector from './components/UI/IOSDetector';
 import InstallPrompt from './components/UI/InstallPrompt';
 import BasicLandingPage from './components/Landing/BasicLandingPage';
-import { ListBulletIcon, CalendarIcon, UserIcon } from '@heroicons/react/24/outline';
+import { ListBulletIcon, CalendarIcon, UserIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState('todo');
@@ -45,6 +46,7 @@ function DashboardContent() {
           {activeTab === 'todo' && <TodoTab selectedDate={selectedDate} setSelectedDate={setSelectedDate} />}
           {activeTab === 'monthly' && <MonthlyTab selectedDate={selectedDate} setSelectedDate={setSelectedDate} switchToTodoTab={switchToTodoTab} />}
           {activeTab === 'profile' && <ProfileTab />}
+          {activeTab === 'metrics' && <MetricsTab />}
         </div>
         
         {/* Installation Prompt */}
@@ -65,6 +67,13 @@ function DashboardContent() {
           >
             <CalendarIcon className="h-6 w-6 mb-1" />
             <span>Calendar</span>
+          </button>
+          <button
+            className={`flex-1 py-2 text-center flex flex-col items-center ${activeTab === 'metrics' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}
+            onClick={() => setActiveTab('metrics')}
+          >
+            <ChartBarIcon className="h-6 w-6 mb-1" />
+            <span>Metrics</span>
           </button>
           <button
             className={`flex-1 py-2 text-center flex flex-col items-center ${activeTab === 'profile' ? 'text-green-500 border-t-2 border-green-500' : 'text-gray-500'}`}

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../AuthContext';
 import AddTodoDialog from './AddTodoDialog';
 import DeleteTodoDialog from './DeleteTodoDialog';
+import EditTodoDialog from './EditTodoDialog';
+import EditRecurringSeriesDialog from './EditRecurringSeriesDialog';
 import DatePicker from './DatePicker';
 import { Menu, Transition } from '@headlessui/react';
 // import { Menu, Transition, TransitionChild } from '@headlessui/react';
@@ -10,7 +12,7 @@ import { fetchTodoInstances } from '../../services/read';
 import { refreshRecurringTodoInstances } from '../../services/create';
 import { toggleTodoCompleted } from '../../services/update';
 import { deleteTodoInstance, deleteRecurringTodo } from '../../services/delete';
-import type { TodoItem } from '../../models';
+import type { TodoItem, RecurrencePattern } from '../../models';
 
 interface TodoTabProps {
   selectedDate: Date;
@@ -20,7 +22,10 @@ interface TodoTabProps {
 export default function TodoTab({ selectedDate, setSelectedDate }: TodoTabProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isEditTodoDialogOpen, setIsEditTodoDialogOpen] = useState(false);
+  const [isEditRecurringSeriesDialogOpen, setIsEditRecurringSeriesDialogOpen] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState<TodoItem | null>(null);
+  const [selectedRecurrencePattern, setSelectedRecurrencePattern] = useState<RecurrencePattern | null>(null);
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,16 +94,60 @@ export default function TodoTab({ selectedDate, setSelectedDate }: TodoTabProps)
       );
     }
   };
-
   const handleOpenDeleteDialog = (todo: TodoItem) => {
     setSelectedTodo(todo);
     setIsDeleteDialogOpen(true);
   };
-
   const handleEditTodo = (todo: TodoItem) => {
-    // For now just log to console as per requirements
-    console.log("Editing todo:", todo.name);
-  };  const handleDeleteConfirm = async () => {
+    setSelectedTodo(todo);
+    
+    // Check if this is a recurring todo
+    if (todo.isRecurring && todo.recurrenceId) {
+      // Directly open the recurring series dialog for recurring todos
+      console.log("Editing recurring todo series:", todo.name);
+      
+      // In a real implementation, you would fetch the recurrence pattern
+      // For demo purposes, we'll create a mock recurrence pattern
+      const mockPattern: RecurrencePattern = {
+        id: todo.recurrenceId,
+        name: todo.name,
+        rrule: 'RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR', // Example rule
+        startsOn: todo.date,
+        createdAt: todo.createdAt,
+        editedAt: todo.editedAt
+      };
+      
+      setSelectedRecurrencePattern(mockPattern);
+      setIsEditRecurringSeriesDialogOpen(true);
+    } else {
+      // Handle regular non-recurring todo edit
+      console.log("Editing non-recurring todo:", todo.name);
+      setIsEditTodoDialogOpen(true);
+    }
+  };
+  
+  const handleSaveRecurringSeries = (updatedTodo: TodoItem, updatedPattern: RecurrencePattern | null) => {
+    console.log("Saving updated recurring series:", updatedTodo, updatedPattern);
+    // This would call your update service in a real implementation
+    // For now, we'll just update the local state for demonstration
+    setTodos(prevTodos =>
+      prevTodos.map(todo =>
+        todo.id === updatedTodo.id ? updatedTodo : todo
+      )
+    );
+  };
+  
+  const handleSaveTodo = (updatedTodo: TodoItem) => {
+    console.log("Saving updated todo:", updatedTodo);
+    // This would call your update service in a real implementation
+    // For now, we'll just update the local state for demonstration
+    setTodos(prevTodos =>
+      prevTodos.map(todo =>
+        todo.id === updatedTodo.id ? updatedTodo : todo
+      )
+    );
+  };
+  const handleDeleteConfirm = async () => {
     if (!currentUser || !selectedTodo || !selectedTodo.id) return;
     
     try {
@@ -254,14 +303,32 @@ export default function TodoTab({ selectedDate, setSelectedDate }: TodoTabProps)
         isOpen={isDialogOpen} 
         onClose={() => setIsDialogOpen(false)}
         selectedDate={selectedDate}
-      />
-      {selectedTodo && (
+      />        {selectedTodo && (
         <DeleteTodoDialog 
           isOpen={isDeleteDialogOpen} 
           onClose={() => setIsDeleteDialogOpen(false)}
           todoName={selectedTodo.name}
           isRecurring={selectedTodo.isRecurring || false}
           onDeleteConfirm={handleDeleteConfirm}
+        />
+      )}
+      
+      {selectedTodo && (
+        <EditTodoDialog
+          isOpen={isEditTodoDialogOpen}
+          onClose={() => setIsEditTodoDialogOpen(false)}
+          todo={selectedTodo}
+          onSave={handleSaveTodo}
+        />
+      )}
+      
+      {selectedTodo && (
+        <EditRecurringSeriesDialog
+          isOpen={isEditRecurringSeriesDialogOpen}
+          onClose={() => setIsEditRecurringSeriesDialogOpen(false)}
+          todo={selectedTodo}
+          recurrencePattern={selectedRecurrencePattern}
+          onSave={handleSaveRecurringSeries}
         />
       )}
     </div>

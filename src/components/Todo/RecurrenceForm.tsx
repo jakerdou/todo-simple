@@ -4,12 +4,14 @@ import { RRule } from 'rrule';
 interface RecurrenceFormProps {
   isRecurring: boolean;
   onChange: (rruleString: string | null) => void;
+  initialRRule?: string | null;
 }
 
-export default function RecurrenceForm({ isRecurring, onChange }: RecurrenceFormProps) {
+export default function RecurrenceForm({ isRecurring, onChange, initialRRule }: RecurrenceFormProps) {
   // Recurrence settings
   const [frequency, setFrequency] = useState<string>('WEEKLY');
   const [interval, setInterval] = useState<number>(1);
+  const [intervalInputValue, setIntervalInputValue] = useState<string>("1"); // Used for input control
   const [weekdays, setWeekdays] = useState<number[]>([new Date().getDay() || 7]); // Default to current day
   const [monthlyType, setMonthlyType] = useState<'dayOfMonth' | 'dayOfWeek'>('dayOfMonth');
   const [monthDay, setMonthDay] = useState<number>(new Date().getDate()); // Default to current day of month
@@ -23,6 +25,105 @@ export default function RecurrenceForm({ isRecurring, onChange }: RecurrenceForm
   // For yearly recurrence
   const [yearMonth, setYearMonth] = useState<number>(new Date().getMonth() + 1); // 1-12 for Jan-Dec
   const [yearDay, setYearDay] = useState<number>(new Date().getDate());
+  // Parse initial RRule if provided
+  useEffect(() => {
+    if (initialRRule) {
+      try {
+        const rule = RRule.fromString(initialRRule);
+        
+        // Set frequency
+        const freqMap: {[key: number]: string} = {
+          [RRule.DAILY]: 'DAILY',
+          [RRule.WEEKLY]: 'WEEKLY',
+          [RRule.MONTHLY]: 'MONTHLY',
+          [RRule.YEARLY]: 'YEARLY'
+        };
+        setFrequency(freqMap[rule.options.freq]);
+        
+        // Set interval
+        if (rule.options.interval) {
+          setInterval(rule.options.interval);
+        }
+        
+        // Set weekdays for weekly frequency
+        if (rule.options.freq === RRule.WEEKLY && rule.options.byweekday) {
+          const weekdayMap: {[key: number]: number} = {
+            0: 0, // Sunday
+            1: 1, // Monday
+            2: 2, // Tuesday
+            3: 3, // Wednesday
+            4: 4, // Thursday
+            5: 5, // Friday
+            6: 6  // Saturday
+          };
+          
+          const selectedDays = Array.isArray(rule.options.byweekday) 
+            ? rule.options.byweekday.map((day: any) => {
+                // RRule can store weekdays as numbers or as objects with a weekday property
+                const dayValue = typeof day === 'number' ? day : day.weekday;
+                return weekdayMap[dayValue];
+              })
+            : [];
+          
+          if (selectedDays.length > 0) {
+            setWeekdays(selectedDays);
+          }
+        }
+        
+        // Set monthly options
+        if (rule.options.freq === RRule.MONTHLY) {
+          if (rule.options.bymonthday && rule.options.bymonthday.length > 0) {
+            setMonthlyType('dayOfMonth');
+            setMonthDay(rule.options.bymonthday[0]);
+          } else if (rule.options.byweekday && rule.options.bysetpos) {
+            setMonthlyType('dayOfWeek');
+            
+            // Set the week position (e.g., first, second, third, fourth, last)
+            if (Array.isArray(rule.options.bysetpos) && rule.options.bysetpos.length > 0) {
+              setWeekPosition(rule.options.bysetpos[0]);
+            } else if (typeof rule.options.bysetpos === 'number') {
+              setWeekPosition(rule.options.bysetpos);
+            }
+            
+            // Set the weekday (e.g., Monday, Tuesday, etc.)
+            const weekdayMap: {[key: number]: number} = {
+              0: 0, // Sunday
+              1: 1, // Monday
+              2: 2, // Tuesday
+              3: 3, // Wednesday
+              4: 4, // Thursday
+              5: 5, // Friday
+              6: 6  // Saturday
+            };
+            
+            if (Array.isArray(rule.options.byweekday) && rule.options.byweekday.length > 0) {
+              const day = rule.options.byweekday[0];
+              const dayValue = typeof day === 'number' ? day : (day as any).weekday;
+              setWeekPositionDay(weekdayMap[dayValue]);
+            }
+          }
+        }
+        
+        // Set yearly options
+        if (rule.options.freq === RRule.YEARLY) {
+          if (rule.options.bymonth && rule.options.bymonth.length > 0) {
+            setYearMonth(rule.options.bymonth[0]);
+          }
+          
+          if (rule.options.bymonthday && rule.options.bymonthday.length > 0) {
+            setYearDay(rule.options.bymonthday[0]);
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing RRule:', error);
+      }
+    }
+  }, [initialRRule]);
+
+  // Update the input value when interval changes through other means
+  useEffect(() => {
+    setIntervalInputValue(interval.toString());
+  }, [interval]);
 
   // Build and update the RRule string whenever settings change
   useEffect(() => {
@@ -127,13 +228,34 @@ export default function RecurrenceForm({ isRecurring, onChange }: RecurrenceForm
         <label className="block text-sm font-medium text-gray-300 mb-1">
           Every
         </label>
-        <div className="flex items-center">
-          <input
-            type="number"
+        <div className="flex items-center">          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             min="1"
             max="99"
-            value={interval}
-            onChange={(e) => setInterval(parseInt(e.target.value) || 1)}
+            value={intervalInputValue}
+            onChange={(e) => {
+              // Allow empty value or valid numbers
+              const inputValue = e.target.value;
+              setIntervalInputValue(inputValue);
+              
+              if (inputValue === "") {
+                // Input is empty but don't update interval yet
+              } else {
+                const newValue = parseInt(inputValue);
+                if (!isNaN(newValue) && newValue >= 1 && newValue <= 99) {
+                  setInterval(newValue);
+                }
+              }
+            }}
+            onBlur={() => {
+              // On blur, ensure we have a valid value (min 1)
+              if (intervalInputValue === "" || parseInt(intervalInputValue) < 1) {
+                setIntervalInputValue("1");
+                setInterval(1);
+              }
+            }}
             className="w-16 rounded-md border border-gray-600 bg-gray-700 py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
           />
           <span className="ml-2 text-sm text-gray-300">
