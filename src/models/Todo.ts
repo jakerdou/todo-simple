@@ -18,4 +18,11 @@ export interface RecurrencePattern {
   startsOn: string;  // YYYY-MM-DD format for the start date
   createdAt: Timestamp;
   editedAt: Timestamp | null;
+  exceptions?: {
+    [date: string]: {
+      type: 'deleted' | 'modified';
+      modifiedName?: string;  // Only needed for modified instances
+      modifiedDate?: string;  // In case date was changed
+    }
+  };
 }

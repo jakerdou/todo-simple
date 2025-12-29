@@ -98,7 +98,8 @@ export declare function toggleTodoCompleted(
 // Deletes a single todo instance
 export declare function deleteTodoInstance(
   userId: string,
-  todoId: string
+  todoId: string,
+  isRecurringInstance?: boolean
 ): Promise<void>;
 
 // Deletes a recurring todo pattern and optionally all of its instances

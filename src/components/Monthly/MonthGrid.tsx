@@ -135,8 +135,16 @@ export default function MonthGrid({ date = new Date(), onDateChange, onDayClick 
         
         // console.log(`[MonthGrid] Date range: ${formatDateString(firstDay)} to ${formatDateString(lastDay)}`);
         
-        // Refresh recurring todos for the month range
-        await refreshRecurringTodoInstances(currentUser.uid, firstDay, lastDay);
+        // Refresh recurring todos for the month range.
+        // Guardrail: don't generate instances for months in the past.
+        const now = new Date();
+        const currentMonthIndex = now.getFullYear() * 12 + now.getMonth();
+        const viewedMonthIndex = year * 12 + month;
+        const shouldRefreshRecurring = viewedMonthIndex >= currentMonthIndex;
+
+        if (shouldRefreshRecurring) {
+          await refreshRecurringTodoInstances(currentUser.uid, firstDay, lastDay);
+        }
         // console.log('[MonthGrid] Refreshed recurring todos');
         
         // Format dates for API

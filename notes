@@ -20,5 +20,6 @@ db structure -
 
 
 
-recurring starts on date doesn't work
 edit recurrence doesnt work, it shows random recurrence rule
+delete instance of recurrence, need to modify database
+right now we just modify dtstart when refreshing recurring todos (create.ts line 153) so that we create todos for all days in the current month. what we should do is correctly set the dtstart in the recurrence rule when we create it.

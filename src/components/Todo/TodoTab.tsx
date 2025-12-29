@@ -114,7 +114,8 @@ export default function TodoTab({ selectedDate, setSelectedDate }: TodoTabProps)
         rrule: 'RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR', // Example rule
         startsOn: todo.date,
         createdAt: todo.createdAt,
-        editedAt: todo.editedAt
+        editedAt: todo.editedAt,
+        exceptions: {} // Initialize with empty exceptions
       };
       
       setSelectedRecurrencePattern(mockPattern);
@@ -146,14 +147,21 @@ export default function TodoTab({ selectedDate, setSelectedDate }: TodoTabProps)
         todo.id === updatedTodo.id ? updatedTodo : todo
       )
     );
-  };
-  const handleDeleteConfirm = async () => {
+  };  
+  const handleDeleteConfirm = async (deleteOption?: 'instance' | 'series') => {
     if (!currentUser || !selectedTodo || !selectedTodo.id) return;
     
-    try {
+    try {      
       if (selectedTodo.isRecurring && selectedTodo.recurrenceId) {
-        // For recurring todos, always delete all instances
-        await deleteRecurringTodo(currentUser.uid, selectedTodo.recurrenceId, true);
+        if (deleteOption === 'instance') {
+          // Delete just this instance of the recurring todo and add it to exceptions
+          await deleteTodoInstance(currentUser.uid, selectedTodo.id, true);
+          console.log(`Deleted single instance of recurring todo: ${selectedTodo.name} (${selectedTodo.date})`);
+        } else {
+          // Delete the entire recurring series
+          await deleteRecurringTodo(currentUser.uid, selectedTodo.recurrenceId, true);
+          console.log(`Deleted entire recurring series: ${selectedTodo.name}`);
+        }
       } else {
         // Delete a regular non-recurring todo
         await deleteTodoInstance(currentUser.uid, selectedTodo.id);

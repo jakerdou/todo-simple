@@ -1,18 +1,46 @@
-import { collection, query, where, getDocs, doc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, deleteDoc, writeBatch, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 /**
  * Deletes a single todo instance
  * @param userId - The ID of the current user
  * @param todoId - The ID of the todo instance to delete
+ * @param isRecurringInstance - Whether this is an instance of a recurring todo
  * @returns Promise that resolves when the todo is deleted
  */
 export const deleteTodoInstance = async (
   userId: string,
-  todoId: string
+  todoId: string,
+  isRecurringInstance: boolean = false
 ): Promise<void> => {
   try {
     const todoRef = doc(db, `users/${userId}/instances/${todoId}`);
+    
+    // If it's a recurring instance, we need to add it to the exceptions list
+    if (isRecurringInstance) {
+      // First, get the todo data to extract recurrenceId and date
+      const todoSnap = await getDoc(todoRef);
+      
+      if (todoSnap.exists()) {
+        const todoData = todoSnap.data();
+        
+        if (todoData.recurrenceId && todoData.date) {
+          // Add this date to the exceptions list in the recurrence pattern
+          const recurrenceRef = doc(db, `users/${userId}/recurrences/${todoData.recurrenceId}`);
+          
+          // Use field path notation to update the nested object
+          await updateDoc(recurrenceRef, {
+            [`exceptions.${todoData.date}`]: {
+              type: 'deleted'
+            }
+          });
+          
+          console.log(`Added exception for date ${todoData.date} to recurrence ${todoData.recurrenceId}`);
+        }
+      }
+    }
+    
+    // Delete the instance
     await deleteDoc(todoRef);
     console.log('Todo instance deleted:', todoId);
   } catch (error) {
